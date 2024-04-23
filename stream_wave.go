@@ -11,6 +11,7 @@ import (
 
 var spawns = []string{}
 var afflictions = []string{}
+var characters = []string{}
 
 func addMonster(w http.ResponseWriter, r *http.Request) {
 	var monster = r.URL.Path[len("/add/"):]
@@ -35,12 +36,27 @@ func fetchAffliction(w http.ResponseWriter, r *http.Request) {
 	afflictions = []string{}
 }
 
+func addCharacter(w http.ResponseWriter, r *http.Request) {
+	var character = r.URL.Path[len("/add_character/"):]
+	characters = append(characters, character)
+	fmt.Printf("Added %s to queue\n", character)
+}
+
+func fetchCharacter(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("Fetched characters next characters wave soon\n")
+	io.WriteString(w, strings.Join(characters[:], "|"))
+	characters = []string{}
+}
+
 func main() {
 	http.HandleFunc("/add/", addMonster)
 	http.HandleFunc("/fetch", fetchMonsters)
 
 	http.HandleFunc("/add_affliction/", addAffliction)
 	http.HandleFunc("/fetch_affliction", fetchAffliction)
+
+	http.HandleFunc("/add_character/", addCharacter)
+	http.HandleFunc("/fetch_character", fetchCharacter)
 
 	fmt.Printf("Starting server on port 51525\n")
 	err := http.ListenAndServe(":51525", nil)
